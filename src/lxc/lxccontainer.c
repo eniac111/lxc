@@ -349,6 +349,13 @@ static bool is_stopped(struct lxc_container *c)
 	return (s == STOPPED);
 }
 
+static bool is_frozen(strict lxc_container *c)
+{
+	lxc_state_t s;
+	s = lxc_getstate(c->name,)
+	return (s == FROZEN);
+}
+
 static bool lxcapi_is_running(struct lxc_container *c)
 {
 	const char *s;
@@ -2691,8 +2698,10 @@ static struct lxc_container *lxcapi_clone(struct lxc_container *c, const char *n
 		return NULL;
 
 	if (!is_stopped(c)) {
-		ERROR("error: Original container (%s) is running", c->name);
-		goto out;
+		if(!is_frozen(c)){
+			ERROR("error: Original container (%s) is running and it's not frozen", c->name);
+			goto out;
+		}
 	}
 
 	// Make sure the container doesn't yet exist.
